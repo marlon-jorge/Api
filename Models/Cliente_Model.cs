@@ -5,19 +5,18 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Web;
 
 namespace Api.Models
 {
     public class Cliente_Model
     {
+        private static ConectaSQL conexion = new ConectaSQL();
+        private static SqlCommand coman = new SqlCommand();
         public static string InsertarCliente(Cliente_bean cliente)
         {
             string messaje = "REGISTRO INSERTADO CORRECTAMENTE";            
             try
             {
-                ConectaSQL conexion = new ConectaSQL();
-                SqlCommand coman = new SqlCommand();
                 coman.Connection = conexion.AbrirConexion();
                 coman.CommandText = "cliente_SP";
                 coman.CommandType = CommandType.StoredProcedure;
@@ -34,12 +33,10 @@ namespace Api.Models
             }
         }
         public static List<Cliente_bean> ConsultarCliente(int clienteCod)
-        {
-            ConectaSQL conexion = new ConectaSQL();
-            SqlCommand coman = new SqlCommand();
+        {            
             List<Cliente_bean> clientes = new List<Cliente_bean>();
             DataTable table = new DataTable();
-            String sql = "select * from cliente";
+            String sql = "select * from cliente where corr="+ clienteCod;
             SqlDataAdapter adapter = new SqlDataAdapter(sql, conexion.AbrirConexion());
             adapter.Fill(table);
             
@@ -54,6 +51,24 @@ namespace Api.Models
                 }                      
             return clientes;
         }
-    
+
+        public static string EliminaCliente(int clienteCod)
+        {
+            string mensaje = "";
+            try
+            {                
+                String sql = "delete from cliente where corr=" + clienteCod;
+                SqlDataAdapter adapter = new SqlDataAdapter(sql, conexion.AbrirConexion());
+                adapter.SelectCommand.ExecuteNonQuery();
+                conexion.CerrarConexion();
+                return mensaje="se elimino correctamente";
+            } catch (Exception ex)
+            {
+                conexion.CerrarConexion();
+                return mensaje="no se logro eliminar causa del error:" + ex.Message;
+            }
+        }
+        
+
     }
 }

@@ -99,7 +99,8 @@ namespace Api.Models
                                                                            + table2.Rows[0][1].ToString() + s
                                                                            + table2.Rows[0][3].ToString() + s
                                                                            + float.Parse(table2.Rows[0][2].ToString()) + "')";
-                            Cmd.ExecuteNonQuery();
+                            adapter2.SelectCommand.ExecuteNonQuery();
+                            //Cmd.ExecuteNonQuery();
                             conexion.CerrarConexion();
                             mensaje = "libro comprado correctamente";
                         }
@@ -124,5 +125,27 @@ namespace Api.Models
             }
             return mensaje;
         }
+
+
+        public static string EliminaCompraLibro(int clienteCod)
+        {
+            string mensaje = "";
+            try
+            {                
+                String sql = "delete from detalle where corr=" + clienteCod;
+                SqlDataAdapter adapter = new SqlDataAdapter(sql, conexion.AbrirConexion());
+                adapter.SelectCommand.ExecuteNonQuery();
+
+                conexion.CerrarConexion();
+                return mensaje = "se elimino correctamente";
+            }
+            catch (Exception ex)
+            {
+                conexion.CerrarConexion();
+                return mensaje = "no se logro eliminar causa del error:" + ex.Message;
+            }
+        }
+
+
     }
 }
