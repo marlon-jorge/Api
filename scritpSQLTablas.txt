@@ -1,0 +1,119 @@
+
+
+------------creacio  base de datos------------------
+create database ConfiaTest
+use ConfiaTest
+
+------------------table detalle------------------------
+if OBJECT_ID('detalle')is not null
+drop table detalle
+create table detalle(
+corr int not null  identity(1,1),
+nombre varchar(100),
+apellido varchar(100),
+NombreLibro varchar(100),
+estado varchar(20),
+precio float
+)
+--------------------table cliente--------------------
+if OBJECT_ID('cliente')is not null
+drop table cliente
+create table cliente(
+corr int not null  identity(1,1),
+nombre varchar(100),
+apellido varchar(100),
+);
+-----------------table libros------------------------
+if OBJECT_ID('libros')is not null
+drop table libros
+create table libros(
+corr int not null  identity(1,1),
+nombre varchar(100),
+precio float,
+estado varchar(20)
+);
+
+
+-------------procedimiento para insert ala tabla libros------------------
+alter procedure libro_SP
+@nombre varchar(500),
+@precio varchar(100),
+@estado varchar(20)
+as begin
+	insert into libros(nombre,precio,estado)  values (@nombre,@precio,@estado);
+end
+
+-------------procedimiento para insert ala tabla cliente------------------
+alter procedure cliente_SP
+@nombre varchar(500),
+@apellido varchar(100)
+as begin
+	insert into cliente(nombre,apellido)  values (@nombre,@apellido);
+end
+	
+
+----------------tabla auditoria---------------------
+if OBJECT_ID('auditoria')is not null
+drop table auditoria
+create table auditoria(
+Id_audit int identity(1,1) not null,
+fecha date not null,
+Hora time not null,
+nombreLibro varchar(50)not null,
+EstadoLibo varchar(50)not null,
+descripcion varchar(100)not null,
+Maquina varchar(200)not null,
+usuario varchar(50) not null
+);
+
+
+
+--------------triger de insert--------------
+create trigger Detalle_Insert_TR
+on detalle for insert
+as
+set nocount on
+declare @NomLibro varchar(50)
+declare @estado varchar(50)
+select @NomLibro = NombreLibro,@estado=estado from inserted
+insert into auditoria values(GETDATE(),GETDATE(),@NomLibro,@estado,'registros insertados', HOST_NAME(), SYSTEM_USER)
+go
+
+--insert into detalle values('marlon','jorge','programacion','disponible',12.50)
+--------------triger de delete--------------
+
+create trigger Detalle_Delete_TR
+on detalle for delete
+as
+set nocount on
+declare @NomLibro varchar(50)
+declare @estado varchar(50)
+select @NomLibro = NombreLibro,@estado=estado from deleted
+insert into auditoria values(GETDATE(),GETDATE(),@NomLibro,@estado,'registros eliminados', HOST_NAME(), SYSTEM_USER)
+go
+
+--delete from detalle where corr=1
+
+
+--------------triger de delete--------------
+
+create trigger Detalle_Update_TR
+on detalle for update
+as
+set nocount on
+declare @NomLibro varchar(50)
+declare @estado varchar(50)
+select @NomLibro = NombreLibro,@estado=estado from inserted
+insert into auditoria values(GETDATE(),GETDATE(),@NomLibro,@estado,'registros actualizado', HOST_NAME(), SYSTEM_USER)
+go
+
+--update detalle set estado = 'AGOTADO'  where corr=5
+
+---------
+
+select * from auditoria
+select * from detalle;
+---------------consultas---------------------
+select * from cliente;
+select * from libros;
+select * from detalle;
