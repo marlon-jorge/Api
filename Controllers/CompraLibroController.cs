@@ -16,5 +16,12 @@ namespace Api.Controllers
         {
             return Libro_Model.CompraLibro(cb.corr);
         }
+
+
+        [HttpDelete]
+        public string EliminaCompraLibro(Cliente_bean cb)
+        {
+            return Libro_Model.EliminaCompraLibro(cb.corr);
+        }
     }
 }
