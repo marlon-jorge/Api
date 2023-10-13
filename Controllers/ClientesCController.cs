@@ -22,6 +22,7 @@ namespace Api.Controllers
         public List<Cliente_bean> ListaCliente(int cb)
         {            
             return Cliente_Model.ConsultarCliente(cb);
+
         }
 
 
