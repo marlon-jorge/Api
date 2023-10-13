@@ -1,0 +1,185 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+
+
+    <!--
+        
+        USE [ConfiaTest]
+    GO
+    /****** Object:  Table [dbo].[auditoria]    Script Date: 13/10/2023 14:52:06 ******/
+    SET ANSI_NULLS ON
+    GO
+    SET QUOTED_IDENTIFIER ON
+    GO
+    SET ANSI_PADDING ON
+    GO
+    CREATE TABLE [dbo].[auditoria](
+    [Id_audit] [int] IDENTITY(1,1) NOT NULL,
+    [fecha] [date] NOT NULL,
+    [Hora] [time](7) NOT NULL,
+    [nombreLibro] [varchar](50) NOT NULL,
+    [EstadoLibo] [varchar](50) NOT NULL,
+    [descripcion] [varchar](100) NOT NULL,
+    [Maquina] [varchar](200) NOT NULL,
+    [usuario] [varchar](50) NOT NULL
+    ) ON [PRIMARY]
+
+    GO
+    SET ANSI_PADDING OFF
+    GO
+    /****** Object:  Table [dbo].[cliente]    Script Date: 13/10/2023 14:52:06 ******/
+    SET ANSI_NULLS ON
+    GO
+    SET QUOTED_IDENTIFIER ON
+    GO
+    SET ANSI_PADDING ON
+    GO
+    CREATE TABLE [dbo].[cliente](
+    [corr] [int] IDENTITY(1,1) NOT NULL,
+    [nombre] [varchar](100) NULL,
+    [apellido] [varchar](100) NULL
+    ) ON [PRIMARY]
+
+    GO
+    SET ANSI_PADDING OFF
+    GO
+    /****** Object:  Table [dbo].[detalle]    Script Date: 13/10/2023 14:52:06 ******/
+    SET ANSI_NULLS ON
+    GO
+    SET QUOTED_IDENTIFIER ON
+    GO
+    SET ANSI_PADDING ON
+    GO
+    CREATE TABLE [dbo].[detalle](
+    [corr] [int] IDENTITY(1,1) NOT NULL,
+    [nombre] [varchar](100) NULL,
+    [apellido] [varchar](100) NULL,
+    [NombreLibro] [varchar](100) NULL,
+    [estado] [varchar](20) NULL,
+    [precio] [float] NULL
+    ) ON [PRIMARY]
+
+    GO
+    SET ANSI_PADDING OFF
+    GO
+    /****** Object:  Table [dbo].[libros]    Script Date: 13/10/2023 14:52:06 ******/
+    SET ANSI_NULLS ON
+    GO
+    SET QUOTED_IDENTIFIER ON
+    GO
+    SET ANSI_PADDING ON
+    GO
+    CREATE TABLE [dbo].[libros](
+    [corr] [int] IDENTITY(1,1) NOT NULL,
+    [nombre] [varchar](100) NULL,
+    [precio] [float] NULL,
+    [estado] [varchar](20) NULL
+    ) ON [PRIMARY]
+
+    GO
+    SET ANSI_PADDING OFF
+    GO
+    SET IDENTITY_INSERT [dbo].[auditoria] ON
+
+    INSERT [dbo].[auditoria] ([Id_audit], [fecha], [Hora], [nombreLibro], [EstadoLibo], [descripcion], [Maquina], [usuario]) VALUES (2, CAST(N'2021-09-02' AS Date), CAST(N'17:34:20.5830000' AS Time), N'programacion', N'DISPONIBLE', N'registros insertados', N'DESKTOP-QF02LK0', N'sa')
+    SET IDENTITY_INSERT [dbo].[auditoria] OFF
+    SET IDENTITY_INSERT [dbo].[cliente] ON
+
+    INSERT [dbo].[cliente] ([corr], [nombre], [apellido]) VALUES (1, N'MARLON', N'MENDEZ')
+    INSERT [dbo].[cliente] ([corr], [nombre], [apellido]) VALUES (2, N'moises', N'moises')
+    INSERT [dbo].[cliente] ([corr], [nombre], [apellido]) VALUES (3, N'moises', N'mejia')
+    SET IDENTITY_INSERT [dbo].[cliente] OFF
+    SET IDENTITY_INSERT [dbo].[detalle] ON
+
+    INSERT [dbo].[detalle] ([corr], [nombre], [apellido], [NombreLibro], [estado], [precio]) VALUES (1, N'MARLON', N'MENDEZ', N'programacion', N'DISPONIBLE', 5.1)
+    SET IDENTITY_INSERT [dbo].[detalle] OFF
+    SET IDENTITY_INSERT [dbo].[libros] ON
+
+    INSERT [dbo].[libros] ([corr], [nombre], [precio], [estado]) VALUES (1, N'programacion', 5.1, N'DISPONIBLE')
+    INSERT [dbo].[libros] ([corr], [nombre], [precio], [estado]) VALUES (2, N'programacion2', 5.5, N'AGOTADO')
+    SET IDENTITY_INSERT [dbo].[libros] OFF
+    /****** Object:  StoredProcedure [dbo].[cliente_SP]    Script Date: 13/10/2023 14:52:07 ******/
+    SET ANSI_NULLS ON
+    GO
+    SET QUOTED_IDENTIFIER ON
+    GO
+    create procedure [dbo].[cliente_SP]
+    @nombre varchar(500),
+    @apellido varchar(100)
+    as begin
+    insert into cliente(nombre,apellido)  values (@nombre,@apellido);
+    end
+    GO
+    /****** Object:  StoredProcedure [dbo].[libro_SP]    Script Date: 13/10/2023 14:52:07 ******/
+    SET ANSI_NULLS ON
+    GO
+    SET QUOTED_IDENTIFIER ON
+    GO
+    CREATE procedure [dbo].[libro_SP]
+    @nombre varchar(500),
+    @precio varchar(100),
+    @estado varchar(20)
+    as begin
+    insert into libros(nombre,precio,estado)  values (@nombre,@precio,@estado);
+    end
+    GO
+    /****** Object:  Trigger [dbo].[Detalle_Delete_TR]    Script Date: 13/10/2023 14:52:07 ******/
+    SET ANSI_NULLS ON
+    GO
+    SET QUOTED_IDENTIFIER ON
+    GO
+    create trigger [dbo].[Detalle_Delete_TR]
+    on [dbo].[detalle] for delete
+    as
+    set nocount on
+    declare @NomLibro varchar(50)
+    declare @estado varchar(50)
+    select @NomLibro = NombreLibro,@estado=estado from deleted
+    insert into auditoria values(GETDATE(),GETDATE(),@NomLibro,@estado,'registros eliminados', HOST_NAME(), SYSTEM_USER)
+
+    GO
+    /****** Object:  Trigger [dbo].[Detalle_Insert_TR]    Script Date: 13/10/2023 14:52:07 ******/
+    SET ANSI_NULLS ON
+    GO
+    SET QUOTED_IDENTIFIER ON
+    GO
+    --------------triger de insert--------------
+    create trigger [dbo].[Detalle_Insert_TR]
+    on [dbo].[detalle] for insert
+    as
+    set nocount on
+    declare @NomLibro varchar(50)
+    declare @estado varchar(50)
+    select @NomLibro = NombreLibro,@estado=estado from inserted
+    insert into auditoria values(GETDATE(),GETDATE(),@NomLibro,@estado,'registros insertados', HOST_NAME(), SYSTEM_USER)
+
+    GO
+    /****** Object:  Trigger [dbo].[Detalle_Update_TR]    Script Date: 13/10/2023 14:52:07 ******/
+    SET ANSI_NULLS ON
+    GO
+    SET QUOTED_IDENTIFIER ON
+    GO
+    create trigger [dbo].[Detalle_Update_TR]
+    on [dbo].[detalle] for update
+    as
+    set nocount on
+    declare @NomLibro varchar(50)
+    declare @estado varchar(50)
+    select @NomLibro = NombreLibro,@estado=estado from inserted
+    insert into auditoria values(GETDATE(),GETDATE(),@NomLibro,@estado,'registros actualizado', HOST_NAME(), SYSTEM_USER)
+
+    GO
+        
+-->
+
+
+
+
+
+</body>
+</html>
