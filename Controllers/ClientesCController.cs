@@ -29,6 +29,8 @@ namespace Api.Controllers
         public string EliminaCliente(Cliente_bean cb)
         {
             return Cliente_Model.EliminaCliente(cb.corr);
+
+        }
         public List<Cliente_bean> ListaCliente(Cliente_bean cb)
         {            
             return Cliente_Model.ConsultarCliente(cb.corr);
