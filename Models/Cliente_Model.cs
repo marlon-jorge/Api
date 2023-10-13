@@ -36,7 +36,7 @@ namespace Api.Models
         {            
             List<Cliente_bean> clientes = new List<Cliente_bean>();
             DataTable table = new DataTable();
-            String sql = "select * from cliente";
+            String sql = "select * from cliente where corr="+ clienteCod;
             SqlDataAdapter adapter = new SqlDataAdapter(sql, conexion.AbrirConexion());
             adapter.Fill(table);
             

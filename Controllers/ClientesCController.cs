@@ -19,9 +19,9 @@ namespace Api.Controllers
         }
 
         [HttpGet]        
-        public List<Cliente_bean> ListaCliente(Cliente_bean cb)
+        public List<Cliente_bean> ListaCliente(int cb)
         {            
-            return Cliente_Model.ConsultarCliente(cb.corr);
+            return Cliente_Model.ConsultarCliente(cb);
         }
 
 
@@ -29,6 +29,9 @@ namespace Api.Controllers
         public string EliminaCliente(Cliente_bean cb)
         {
             return Cliente_Model.EliminaCliente(cb.corr);
+        public List<Cliente_bean> ListaCliente(Cliente_bean cb)
+        {            
+            return Cliente_Model.ConsultarCliente(cb.corr);
         }
 
     }
